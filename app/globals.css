@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,900,400,500&display=swap");
+
+:root {
+  --creme: #f0efe9; --blanc: #fffdef; --ciel: #d2e8ff;
+  --or: #fae38f; --bordeaux: #861519; --lime: #c1ff72; --encre: #1a1208;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--creme);
+  color: var(--encre);
+  font-family: "Cabinet Grotesk", sans-serif;
+}
+
+@layer base { h1, h2, h3 { color: #000000 !important; } }
+
+@layer utilities {
+  .font-display { font-family: "Cabinet Grotesk", sans-serif; font-weight: 900; letter-spacing: -0.04em; }
+  .font-accent { font-family: "Cabinet Grotesk", sans-serif; font-style: italic; font-weight: 800; }
+}
