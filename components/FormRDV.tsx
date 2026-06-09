@@ -8,14 +8,14 @@ import { CheckCircle } from "lucide-react"
 const prestationOptions = ["Pose complète capsules","Remplissage","Dépose repose","Semi-permanent","Dépose","Manucure","Mariage / EVJF","Autre"]
 
 type Lieu = "domicile" | "bruna" | ""
-type HorairesData = { domicile: Record<string, string[]>; bruna: string[] }
+type BlockedSlot = { date: string; heures: string[] }
+type HorairesData = { domicile: Record<string, string[]>; bruna: string[]; blockedSlots?: BlockedSlot[] }
 type FormData = { nom: string; tel: string; email: string; prestation: string; ville: string; date: string; heure: string; message: string }
 const INITIAL: FormData = { nom: "", tel: "", email: "", prestation: "", ville: "", date: "", heure: "", message: "" }
 
 function getJour(dateStr: string): string {
   if (!dateStr) return ""
-  const d = new Date(dateStr)
-  return String(d.getDay()) // 0=dim, 1=lun, ..., 6=sam
+  return String(new Date(dateStr + "T12:00:00").getDay())
 }
 
 export default function FormRDV() {
@@ -35,12 +35,18 @@ export default function FormRDV() {
 
   const jour = getJour(form.date)
 
-  // Quels horaires afficher selon le lieu et le jour
+  // Quels horaires afficher selon le lieu, le jour ET les blocages de la date
   const getHoraires = (): string[] => {
     if (!horairesData) return []
-    if (lieu === "bruna") return horairesData.bruna
-    if (lieu === "domicile") return horairesData.domicile[jour] ?? []
-    return []
+    let slots: string[] = []
+    if (lieu === "bruna") slots = horairesData.bruna
+    else if (lieu === "domicile") slots = horairesData.domicile[jour] ?? []
+
+    if (!form.date || !horairesData.blockedSlots) return slots
+    const blocked = horairesData.blockedSlots.find(b => b.date === form.date)
+    if (!blocked) return slots
+    if (blocked.heures.includes("all")) return [] // journée entière bloquée
+    return slots.filter(h => !blocked.heures.includes(h))
   }
 
   const horaires = getHoraires()
